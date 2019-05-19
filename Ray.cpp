@@ -17,7 +17,7 @@ void Ray::closestPt(std::vector<SceneObject*> &sceneObjects)
 {
 	glm::vec3 point(0,0,0);
 	float min = 1.e+6;
-    for(uint i = 0;  i < sceneObjects.size();  i++)
+    for(unsigned int i = 0;  i < sceneObjects.size();  i++)
 	{
         float t = sceneObjects[i]->intersect(pt, dir);
 		if(t > 0)        //Intersects the object
