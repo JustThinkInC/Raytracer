@@ -12,6 +12,7 @@
 #include "SceneObject.h"
 #include "Ray.h"
 #include "Plane.h"
+#include "Cube.h"
 #include <GL/glut.h>
 using namespace std;
 
@@ -136,10 +137,6 @@ void initialize()
 {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
-    glClearColor(0, 0, 0, 1);
-
-	//-- Create a pointer to a sphere object
-    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -90.0), 15.0, glm::vec3(0, 0, 1));
     Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -80.0), 5.0, glm::vec3(0, 1, 0));
     Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -70.0), 3, glm::vec3(1, 0, 0));
     Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -70.0), 4, glm::vec3(1, 0.65, 0));
@@ -149,6 +146,12 @@ void initialize()
                               glm::vec3(20., -20, -200),    //Point C
                               glm::vec3(-20., -20, -200),   //Point D
                               glm::vec3(0.5, 0.5, 0));      //Colour
+    glClearColor(0, 0, 0, 1);
+
+    //-- Create a pointer to a sphere object
+    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -90.0), 15.0, glm::vec3(0, 0, 1));
+
+    Cube *cube = new Cube(glm::vec3(5, -5, -70), glm::vec3(10, -10, -75), glm::vec3(1, 1, 0));
 
 	//--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
@@ -156,6 +159,7 @@ void initialize()
     sceneObjects.push_back(sphere3);
     sceneObjects.push_back(sphere4);
     sceneObjects.push_back(plane);
+    sceneObjects.push_back(cube);
 }
 
 
