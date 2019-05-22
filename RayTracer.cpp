@@ -15,6 +15,7 @@
 #include "Cube.h"
 #include "Cylinder.h"
 #include <GL/glut.h>
+#include "TextureBMP/TextureBMP.h";
 using namespace std;
 
 const float WIDTH = 20.0;  
@@ -26,6 +27,8 @@ const float XMIN = -WIDTH * 0.5;
 const float XMAX =  WIDTH * 0.5;
 const float YMIN = -HEIGHT * 0.5;
 const float YMAX =  HEIGHT * 0.5;
+
+TextureBMP* wood;
 
 vector<SceneObject*> sceneObjects;  //A global list containing pointers to objects in the scene
 
@@ -73,13 +76,38 @@ glm::vec3 trace(Ray ray, int step)
         colorSum = ambientCol * materialCol + lDotn * materialCol + rDotv * specular;
     }
 
-    if(ray.xindex == 0 && step < MAX_STEPS)
-    {
+    if (ray.xindex == 0 && step < MAX_STEPS) {
         glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
         Ray reflectedRay(ray.xpt, reflectedDir);
         glm::vec3 reflectedCol = trace(reflectedRay, step+1); //Recursion!
+
         colorSum = colorSum + (0.8f*reflectedCol);
     }
+
+    if(ray.xindex == 3 && step < MAX_STEPS)
+    {
+        // REFRACTION
+//        glm::vec3 n = sceneObjects[ray.xindex]->normal(ray.xpt);
+        glm::vec3 g = glm::refract(ray.dir, normalVector, 1/1.01f);
+        Ray refrRay(ray.xpt, g);
+        refrRay.closestPt(sceneObjects);
+        if (refrRay.xindex == -1) {
+            return backgroundCol;
+        }
+
+        glm::vec3 m = sceneObjects[refrRay.xindex]->normal(refrRay.xpt);
+        glm::vec3 h = glm::refract(g, -m, 1.01f);
+        Ray refrRay2(refrRay.xpt, h);
+        refrRay2.closestPt(sceneObjects);
+        if (refrRay2.xindex == -1) {
+            return backgroundCol;
+        }
+        glm::vec3 refrCol = trace(refrRay2, step+1);
+
+        colorSum = colorSum + refrCol;
+    }
+
+
 
     return colorSum;
 }
@@ -154,7 +182,11 @@ void initialize()
 
     Cube *cube = new Cube(glm::vec3(5, -5, -70), glm::vec3(10, -10, -75), glm::vec3(1, 1, 0));
 
-    Cylinder *cylinder = new Cylinder(glm::vec3(-5, -5, -70), 5, 10, glm::vec3(1, 1, 1));
+    Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -70), 2, 3, glm::vec3(1, 1, 1));
+
+    wood = new TextureBMP("/assets/brick_1.bmp");
+
+    sphere1->refractionIndex = 1.1003;
 
 	//--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
