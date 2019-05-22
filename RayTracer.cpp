@@ -13,6 +13,7 @@
 #include "Ray.h"
 #include "Plane.h"
 #include "Cube.h"
+#include "Cylinder.h"
 #include <GL/glut.h>
 using namespace std;
 
@@ -153,6 +154,8 @@ void initialize()
 
     Cube *cube = new Cube(glm::vec3(5, -5, -70), glm::vec3(10, -10, -75), glm::vec3(1, 1, 0));
 
+    Cylinder *cylinder = new Cylinder(glm::vec3(-5, -5, -70), 5, 10, glm::vec3(1, 1, 1));
+
 	//--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
     sceneObjects.push_back(sphere2);
@@ -160,6 +163,7 @@ void initialize()
     sceneObjects.push_back(sphere4);
     sceneObjects.push_back(plane);
     sceneObjects.push_back(cube);
+    sceneObjects.push_back(cylinder);
 }
 
 
