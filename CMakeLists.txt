@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Raytracer)
 
-add_executable(RayTracer.out RayTracer.cpp Ray.cpp SceneObject.cpp Sphere.cpp Plane.cpp Cube.cpp Cylinder.cpp)
+add_executable(RayTracer.out RayTracer.cpp Ray.cpp SceneObject.cpp Sphere.cpp Plane.cpp Cube.cpp Cylinder.cpp
+        TextureBMP/TextureBMP.cpp)
 
 
 
