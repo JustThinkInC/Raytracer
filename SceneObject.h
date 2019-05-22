@@ -19,6 +19,9 @@ class SceneObject
 protected:
 	glm::vec3 color;
 public:
+	float alpha; //transparency
+	float refractionIndex;
+
 	SceneObject() {}
     virtual float intersect(glm::vec3 pos, glm::vec3 dir) = 0;
 	virtual glm::vec3 normal(glm::vec3 pos) = 0;
