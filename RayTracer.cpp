@@ -62,17 +62,18 @@ glm::vec3 trace(Ray ray, int step) {
     float lDotn = glm::dot(lightVector, normalVector);
     float rDotv = glm::dot(reflVector, viewVector);
 
+    if (ray.xindex == 4) {
+        float s = (ray.xpt.x + 50) / 100;
+        float t = (ray.xpt.x + 24) / 50;
+
+        materialCol = wood->getColorAt(s, t);
+    }
+
     float specular;
     if (rDotv < 0) {
         specular = 0;
     } else {
         specular = pow(rDotv, 5);
-    }
-
-    if (ray.xindex == 5) {
-        float s = (ray.xpt.x);
-        float t = (ray.xpt.y);
-        colorSum = wood->getColorAt(s, t);
     }
 
 
@@ -114,6 +115,10 @@ glm::vec3 trace(Ray ray, int step) {
     return colorSum;
 }
 
+
+glm::vec3 antiAliasing(glm::vec3 eye, float pixel, float xp, float yp) {
+//    float qPixel
+}
 
 //---The main display module -----------------------------------------------------------
 // In a ray tracing application, it just displays the ray traced image by drawing
