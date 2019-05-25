@@ -14,6 +14,7 @@
 #include "Plane.h"
 #include "Cube.h"
 #include "Cylinder.h"
+#include "Cone.h"
 #include <GL/glut.h>
 #include "TextureBMP/TextureBMP.h";
 
@@ -117,8 +118,32 @@ glm::vec3 trace(Ray ray, int step) {
 
 
 glm::vec3 antiAliasing(glm::vec3 eye, float pixel, float xp, float yp) {
-//    float qPixel
+    float quarterPixel = pixel * 0.25;
+    float quarterHalfPixel= pixel * 0.75;
+
+    glm::vec3 colorSum(0);
+    glm::vec3 avg(0.25);
+
+    Ray ray = Ray(eye, glm::vec3(xp + quarterPixel, yp + quarterPixel, -EDIST));
+    ray.normalize();
+    colorSum+=trace(ray,1);
+
+    ray = Ray(eye, glm::vec3(xp + quarterPixel, yp + quarterHalfPixel, -EDIST));
+    ray.normalize();
+    colorSum+=trace(ray,1);
+
+    ray = Ray(eye, glm::vec3(xp + quarterHalfPixel, yp + quarterPixel, -EDIST));
+    ray.normalize();
+    colorSum+=trace(ray,1);
+
+    ray = Ray(eye, glm::vec3(xp + quarterHalfPixel, yp + quarterHalfPixel, -EDIST));
+    ray.normalize();
+    colorSum+=trace(ray,1);
+
+    colorSum*= avg;
+    return colorSum;
 }
+
 
 //---The main display module -----------------------------------------------------------
 // In a ray tracing application, it just displays the ray traced image by drawing
@@ -148,6 +173,7 @@ void display() {
             Ray ray = Ray(eye, dir);        //Create a ray originating from the camera in the direction 'dir'
             ray.normalize();                //Normalize the direction of the ray to a unit vector
 
+            //glm::vec3 col = antiAliasing(eye, cellX*3, xp, yp);
             glm::vec3 col = trace(ray, 1); //Trace the primary ray and get the colour value
 
             glColor3f(col.r, col.g, col.b);
@@ -172,9 +198,9 @@ void display() {
 void initialize() {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
-    Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -80.0), 5.0, glm::vec3(0, 1, 0));
-    Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -70.0), 3, glm::vec3(1, 0, 0));
-    Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -70.0), 4, glm::vec3(1, 0.65, 0));
+    Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -90.0), 5.0, glm::vec3(0, 1, 0));
+    Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(1, 0, 0));
+    Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(1, 0.65, 0));
 
     Plane *plane = new Plane(glm::vec3(-20., -20, -40),    //Point A
                              glm::vec3(20., -20, -40),     //Point B
@@ -184,15 +210,15 @@ void initialize() {
     glClearColor(0, 0, 0, 1);
 
     //-- Create a pointer to a sphere object
-    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -90.0), 15.0, glm::vec3(0, 0, 1));
+    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -100.0), 15.0, glm::vec3(0, 0, 1));
 
-    Cube *cube = new Cube(glm::vec3(5, -5, -70), glm::vec3(10, -10, -75), glm::vec3(1, 1, 0));
+    Cube *cube = new Cube(glm::vec3(5, -5, -80), glm::vec3(10, -10, -85), glm::vec3(1, 1, 0));
 
-    Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -70), 2, 3, glm::vec3(1, 1, 1));
+    Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
     wood = new TextureBMP("../assets/brick_1.bmp");
 
-    sphere1->refractionIndex = 1.1003;
+    Cone *cone = new Cone(glm::vec3(-10, -15, -75), 5, 10, glm::vec3(1, 0.26, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
@@ -202,6 +228,7 @@ void initialize() {
     sceneObjects.push_back(plane);
     sceneObjects.push_back(cube);
     sceneObjects.push_back(cylinder);
+    sceneObjects.push_back(cone);
 }
 
 
