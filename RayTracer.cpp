@@ -96,6 +96,17 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol = earth->getColorAt(s, t);
     }
 
+    if (ray.xindex == 7) {
+        int function = int(tan(ray.xpt.x)*sin(ray.xpt.y));
+        if (function % 2 == 0) {
+            colorSum = glm::vec3(1, 0, 0);
+        } else if (function % 2 == 1) {
+            colorSum = glm::vec3(0, 0, 1);
+        } else {
+            colorSum = glm::vec3(0, 1, 0);
+        }
+    }
+
     // Reflections
     float specular;
     if (rDotv < 0) {
@@ -269,7 +280,7 @@ void initialize() {
     wood = new TextureBMP("../assets/brick_1.bmp");
     earth = new TextureBMP("../assets/earth.bmp");
 
-    Cone *cone = new Cone(glm::vec3(-10, -15, -75), 5, 10, glm::vec3(1, 0.26, 0));
+    Cone *cone = new Cone(glm::vec3(-10, -15, -75), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
