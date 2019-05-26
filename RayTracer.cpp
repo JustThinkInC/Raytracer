@@ -43,7 +43,10 @@ vector<SceneObject *> sceneObjects;  //A global list containing pointers to obje
 //----------------------------------------------------------------------------------
 glm::vec3 trace(Ray ray, int step) {
     glm::vec3 backgroundCol(0);
+
     glm::vec3 light(10, 40, -3);
+    glm::vec3 lightTwo(-30.0, 20, -3.0);
+
     glm::vec3 ambientCol(0.2);   //Ambient color of light
 
     ray.closestPt(sceneObjects);        //Compute the closest point of intersetion of objects with the ray
@@ -54,15 +57,26 @@ glm::vec3 trace(Ray ray, int step) {
 
     glm::vec3 viewVector = -ray.dir;
     glm::vec3 normalVector = sceneObjects[ray.xindex]->normal(ray.xpt);
+
     glm::vec3 lightVector = light - ray.xpt;
+    glm::vec3 lightVectorTwo = lightTwo - ray.xpt;
+
     lightVector = glm::normalize(lightVector);
+    lightVectorTwo = glm::normalize(lightVectorTwo);
+
+
     glm::vec3 reflVector = glm::reflect(-lightVector, normalVector);
+    glm::vec3 reflVectorTwo = glm::reflect(-lightVectorTwo, normalVector);
 
     glm::vec3 colorSum = ambientCol * materialCol;
 
     float lDotn = glm::dot(lightVector, normalVector);
-    float rDotv = glm::dot(reflVector, viewVector);
+    float lDotnTwo = glm::dot(lightVectorTwo, normalVector);
 
+    float rDotv = glm::dot(reflVector, viewVector);
+    float rDotvTwo = glm::dot(reflVectorTwo, viewVector);
+
+    // Texture for floor
     if (ray.xindex == 4) {
         float s = (ray.xpt.x + 50) / 100;
         float t = (ray.xpt.x + 24) / 50;
@@ -70,6 +84,7 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol = wood->getColorAt(s, t);
     }
 
+    // Reflections
     float specular;
     if (rDotv < 0) {
         specular = 0;
@@ -77,15 +92,33 @@ glm::vec3 trace(Ray ray, int step) {
         specular = pow(rDotv, 5);
     }
 
+    float specularTwo;
+    if (rDotvTwo < 0) {
+        specular = 0;
+    } else {
+        specularTwo = pow(rDotvTwo, 10);
+    }
 
+    // Shadows
     Ray shadow(ray.xpt, lightVector);
     shadow.closestPt(sceneObjects);
+
+    Ray shadowTwo(ray.xpt, lightVectorTwo);
+    shadowTwo.closestPt(sceneObjects);
+
 
     if (lDotn <= 0 || shadow.xindex > -1 && shadow.xdist < ray.xdist) {
         colorSum += ambientCol * materialCol;
     } else {
         colorSum += ambientCol * materialCol + lDotn * materialCol + rDotv * specular;
     }
+
+    if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
+        colorSum += ambientCol * materialCol;
+    } else {
+        colorSum += ambientCol * materialCol + lDotnTwo * materialCol + rDotvTwo * specular;
+    }
+
 
     if (ray.xindex == 0 && step < MAX_STEPS) {
         glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
