@@ -16,7 +16,7 @@
 #include "Cylinder.h"
 #include "Cone.h"
 #include <GL/glut.h>
-#include "TextureBMP/TextureBMP.h";
+#include "TextureBMP/TextureBMP.h"
 
 using namespace std;
 
@@ -33,6 +33,7 @@ const float YMAX = HEIGHT * 0.5;
 bool inside = true;
 
 TextureBMP *wood;
+TextureBMP *earth;
 
 vector<SceneObject *> sceneObjects;  //A global list containing pointers to objects in the scene
 
@@ -82,6 +83,17 @@ glm::vec3 trace(Ray ray, int step) {
         float t = (ray.xpt.x + 24) / 50;
 
         materialCol = wood->getColorAt(s, t);
+    }
+
+    // Texture for sphere:
+    // https://stackoverflow.com/questions/22420778/texture-mapping-in-a-ray-tracing-for-sphere-in-c
+    //http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
+    if (ray.xindex == 2) {
+        glm::vec3 center = glm::vec3(5.0, 5, -80.0);
+        glm::vec3 N = glm::normalize(ray.xpt - center);
+        float s = 0.5 - atan2(N.z, N.x) / (2 * M_PI);
+        float t = 0.5 + asin(N.y) / M_PI;
+        materialCol = earth->getColorAt(s, t);
     }
 
     // Reflections
@@ -232,7 +244,7 @@ void initialize() {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
     Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -90.0), 5.0, glm::vec3(0, 1, 0));
-    Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(1, 0, 0));
+    Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(0, 0, 0));
     Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(1, 0.65, 0));
 
     Plane *plane = new Plane(glm::vec3(-20., -20, -40),    //Point A
@@ -250,6 +262,7 @@ void initialize() {
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
     wood = new TextureBMP("../assets/brick_1.bmp");
+    earth = new TextureBMP("../assets/earth.bmp");
 
     Cone *cone = new Cone(glm::vec3(-10, -15, -75), 5, 10, glm::vec3(1, 0.26, 0));
 
