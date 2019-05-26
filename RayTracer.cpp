@@ -106,9 +106,9 @@ glm::vec3 trace(Ray ray, int step) {
 
     float specularTwo;
     if (rDotvTwo < 0) {
-        specular = 0;
+        specularTwo = 0;
     } else {
-        specularTwo = pow(rDotvTwo, 10);
+        specularTwo = pow(rDotvTwo, 5);
     }
 
     // Shadows
@@ -127,9 +127,10 @@ glm::vec3 trace(Ray ray, int step) {
 
     if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
         colorSum += ambientCol * materialCol;
-    } else {
-        colorSum += ambientCol * materialCol + lDotnTwo * materialCol + rDotvTwo * specular;
     }
+//    else {
+//        colorSum += ambientCol * materialCol + lDotnTwo * materialCol + rDotvTwo * specularTwo;
+//    }
 
 
     if (ray.xindex == 0 && step < MAX_STEPS) {
@@ -163,29 +164,33 @@ glm::vec3 trace(Ray ray, int step) {
 
 
 glm::vec3 antiAliasing(glm::vec3 eye, float pixel, float xp, float yp) {
-    float quarterPixel = pixel * 0.25;
-    float quarterHalfPixel= pixel * 0.75;
-
     glm::vec3 colorSum(0);
-    glm::vec3 avg(0.25);
 
-    Ray ray = Ray(eye, glm::vec3(xp + quarterPixel, yp + quarterPixel, -EDIST));
+    float quarterPixel = pixel * 0.25;
+    float halfPixel = pixel * 0.5;
+    float centerX = xp + quarterPixel;
+    float centerY = yp + quarterPixel;
+
+    Ray ray = Ray(eye, glm::vec3(centerX, centerY, -EDIST));
     ray.normalize();
-    colorSum+=trace(ray,1);
+    colorSum += trace(ray,1);
 
-    ray = Ray(eye, glm::vec3(xp + quarterPixel, yp + quarterHalfPixel, -EDIST));
+    ray = Ray(eye, glm::vec3(centerX + halfPixel, centerY, -EDIST));
     ray.normalize();
-    colorSum+=trace(ray,1);
+    colorSum += trace(ray,1);
 
-    ray = Ray(eye, glm::vec3(xp + quarterHalfPixel, yp + quarterPixel, -EDIST));
+    ray = Ray(eye, glm::vec3(centerX, centerY + halfPixel, -EDIST));
     ray.normalize();
-    colorSum+=trace(ray,1);
+    colorSum += trace(ray,1);
 
-    ray = Ray(eye, glm::vec3(xp + quarterHalfPixel, yp + quarterHalfPixel, -EDIST));
+    ray = Ray(eye, glm::vec3(centerX + halfPixel, centerY + halfPixel, -EDIST));
     ray.normalize();
-    colorSum+=trace(ray,1);
+    colorSum += trace(ray,1);
 
-    colorSum*= avg;
+    // Average the color
+    colorSum *= glm::vec3(0.25);
+
+
     return colorSum;
 }
 
@@ -218,8 +223,8 @@ void display() {
             Ray ray = Ray(eye, dir);        //Create a ray originating from the camera in the direction 'dir'
             ray.normalize();                //Normalize the direction of the ray to a unit vector
 
-            //glm::vec3 col = antiAliasing(eye, cellX*3, xp, yp);
-            glm::vec3 col = trace(ray, 1); //Trace the primary ray and get the colour value
+            glm::vec3 col = antiAliasing(eye, cellX, xp, yp);
+//            glm::vec3 col = trace(ray, 1); //Trace the primary ray and get the colour value
 
             glColor3f(col.r, col.g, col.b);
             glVertex2f(xp, yp);                //Draw each cell with its color value
