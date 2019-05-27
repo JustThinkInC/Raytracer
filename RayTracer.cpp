@@ -15,6 +15,7 @@
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Cone.h"
+#include "Tetrahedron.h"
 #include <GL/glut.h>
 #include "TextureBMP/TextureBMP.h"
 
@@ -75,22 +76,53 @@ glm::vec3 trace(Ray ray, int step) {
     float rDotv = glm::dot(reflVector, viewVector);
 
     // Texture for floor
-    if (ray.xindex == 4) {
-        float s = (ray.xpt.x + 50) / 100;
-        float t = (ray.xpt.x + 24) / 50;
+//    if (ray.xindex == 4) {
+//        float s = (ray.xpt.x + 50) / 100;
+//        float t = (ray.xpt.y + 50) / 50;
+//
+//        materialCol = wood->getColorAt(s, t);
+//    }
 
-        materialCol = wood->getColorAt(s, t);
+    if (ray.xindex == 4) {
+
+//        float s = (ray.xpt.x - (-40)) / (40 - (-40));
+//        float t = (ray.xpt.z - (-40)) / ((-200) - (-40));
+
+        float a1 = -20;
+        float a2 = 20;
+        float b1 = -40;
+        float b2 = -200;
+        float texcoords = (ray.xpt.x-a1)/(a2-a1);
+        float texcoordt = (ray.xpt.z-b1)/(b2-b1);
+        materialCol = wood->getColorAt(texcoords, texcoordt);
     }
 
     // Texture for sphere:
     // https://stackoverflow.com/questions/22420778/texture-mapping-in-a-ray-tracing-for-sphere-in-c
     // http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
+    if (ray.xindex == 1) {
+        glm::vec3 center = glm::vec3(14, 10, -90);
+        glm::vec3 N = glm::normalize(ray.xpt - center);
+        float s = 0.5 + atan2(N.z, N.x) / (2 * M_PI);
+        float t = 0.5 + asin(N.y) / M_PI;
+        materialCol = earth->getColorAt(s, t);
+    }
+
+
+
     if (ray.xindex == 2) {
-        glm::vec3 center = glm::vec3(5.0, 5, -80.0);
+        glm::vec3 center = glm::vec3(5.0, 5, -80);
         glm::vec3 N = glm::normalize(ray.xpt - center);
         float s = 0.5 - atan2(N.z, N.x) / (2 * M_PI);
         float t = 0.5 + asin(N.y) / M_PI;
         materialCol = earth->getColorAt(s, t);
+    }
+
+    // Making a crate...
+    if (ray.xindex == 5) {
+        float s = (ray.xpt.x - 10) / (15-10);
+        float t = (ray.xpt.y - 20) / (20 - 15);
+        materialCol = wood->getColorAt(s, t);
     }
 
     // Procedural texture for cone
@@ -140,6 +172,15 @@ glm::vec3 trace(Ray ray, int step) {
 
         colorSum = colorSum + (0.8f * reflectedCol);
     }
+
+
+//    if (ray.xindex == 4 && step < MAX_STEPS) {
+//        glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
+//        Ray reflectedRay(ray.xpt, reflectedDir);
+//        glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
+//
+//        colorSum = colorSum + (0.2f * reflectedCol);
+//    }
 
     // Refraction
     if (ray.xindex == 3 && step < MAX_STEPS) {
@@ -244,28 +285,39 @@ void display() {
 void initialize() {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
+
+    //-- Create a pointer to a sphere object
+    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -140.0), 15.0, glm::vec3(0, 0, 1));
     Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -90.0), 5.0, glm::vec3(0, 1, 0));
     Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(0, 0, 0));
     Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(0, 0, 0));
 
-    Plane *plane = new Plane(glm::vec3(-20., -20, -40),    //Point A
-                             glm::vec3(20., -20, -40),     //Point B
-                             glm::vec3(20., -20, -200),    //Point C
-                             glm::vec3(-20., -20, -200),   //Point D
-                             glm::vec3(0.5, 0.5, 0));      //Colour
+//    Plane *plane = new Plane(glm::vec3(-40, -20, -40),    //Point A
+//                             glm::vec3(40, -20, -40),     //Point B
+//                             glm::vec3(40, -20, -200),    //Point C
+//                             glm::vec3(-40, -20, -200),   //Point D
+//                             glm::vec3(0, 0, 0));      //Colour
+
+    Plane *plane = new Plane(glm::vec3(- 20., - 20, - 40),
+                             glm::vec3(20., - 20, - 40),
+                             glm::vec3(20., - 20, - 200),
+                             glm::vec3(- 20., - 20, - 200),
+                             glm::vec3(0.5, 0.5, 0));
     glClearColor(0, 0, 0, 1);
 
-    //-- Create a pointer to a sphere object
-    Sphere *sphere1 = new Sphere(glm::vec3(-5.0, -5.0, -100.0), 15.0, glm::vec3(0, 0, 1));
-
-    Cube *cube = new Cube(glm::vec3(5, -5, -80), glm::vec3(10, -10, -85), glm::vec3(1, 1, 0));
+    Cube *cube = new Cube(glm::vec3(10, -15, -90), glm::vec3(15, -20, -95), glm::vec3(0, 0, 0));
 
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
-    wood = new TextureBMP("../assets/brick_1.bmp");
-    earth = new TextureBMP("../assets/earth.bmp");
+    wood = new TextureBMP("../assets/crate.bmp");
+    earth = new TextureBMP("../assets/R&C.bmp");
 
-    Cone *cone = new Cone(glm::vec3(-10, -15, -75), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
+    Cone *cone = new Cone(glm::vec3(-20, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
+    Tetrahedron *tetrahedron = new Tetrahedron(glm::vec3(-30, -20, -90),
+                                                glm::vec3(30, -20, -90),
+                                                glm::vec3(0, -20, -90),
+                                                glm::vec3(0, 20, -90),
+                                                glm::vec3(0, 1, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
