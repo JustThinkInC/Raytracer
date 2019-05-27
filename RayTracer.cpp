@@ -30,8 +30,6 @@ const float XMAX = WIDTH * 0.5;
 const float YMIN = -HEIGHT * 0.5;
 const float YMAX = HEIGHT * 0.5;
 
-bool inside = true;
-
 TextureBMP *wood;
 TextureBMP *earth;
 
@@ -75,7 +73,6 @@ glm::vec3 trace(Ray ray, int step) {
     float lDotnTwo = glm::dot(lightVectorTwo, normalVector);
 
     float rDotv = glm::dot(reflVector, viewVector);
-    float rDotvTwo = glm::dot(reflVectorTwo, viewVector);
 
     // Texture for floor
     if (ray.xindex == 4) {
@@ -87,7 +84,7 @@ glm::vec3 trace(Ray ray, int step) {
 
     // Texture for sphere:
     // https://stackoverflow.com/questions/22420778/texture-mapping-in-a-ray-tracing-for-sphere-in-c
-    //http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
+    // http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
     if (ray.xindex == 2) {
         glm::vec3 center = glm::vec3(5.0, 5, -80.0);
         glm::vec3 N = glm::normalize(ray.xpt - center);
@@ -96,8 +93,9 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol = earth->getColorAt(s, t);
     }
 
+    // Procedural texture for cone
     if (ray.xindex == 7) {
-        int function = int(tan(ray.xpt.x)*sin(ray.xpt.y));
+        int function = int(tan(ray.xpt.x) * sin(ray.xpt.y));
         if (function % 2 == 0) {
             colorSum = glm::vec3(1, 0, 0);
         } else if (function % 2 == 1) {
@@ -113,13 +111,6 @@ glm::vec3 trace(Ray ray, int step) {
         specular = 0;
     } else {
         specular = pow(rDotv, 5);
-    }
-
-    float specularTwo;
-    if (rDotvTwo < 0) {
-        specularTwo = 0;
-    } else {
-        specularTwo = pow(rDotvTwo, 5);
     }
 
     // Shadows
@@ -139,11 +130,9 @@ glm::vec3 trace(Ray ray, int step) {
     if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
         colorSum += ambientCol * materialCol;
     }
-//    else {
-//        colorSum += ambientCol * materialCol + lDotnTwo * materialCol + rDotvTwo * specularTwo;
-//    }
 
 
+    // Reflection
     if (ray.xindex == 0 && step < MAX_STEPS) {
         glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
         Ray reflectedRay(ray.xpt, reflectedDir);
@@ -152,21 +141,17 @@ glm::vec3 trace(Ray ray, int step) {
         colorSum = colorSum + (0.8f * reflectedCol);
     }
 
-
+    // Refraction
     if (ray.xindex == 3 && step < MAX_STEPS) {
-        // REFRACTION
-        float eta;
-        if (inside) {
-            eta = 1/1.003;
-            normalVector = -normalVector;
-        } else {
-            eta = 1.003;
-        }
-        glm::vec3 g = glm::refract(ray.dir, normalVector, eta);
+        float eta = 1.003;
+        glm::vec3 g = glm::refract(ray.dir, normalVector, 1.0f/eta);
         Ray refrRay(ray.xpt, g);
-        glm::vec3 refracCol = trace(refrRay, step + 1);
+        refrRay.closestPt(sceneObjects);
+        glm::vec3 m = sceneObjects[refrRay.xindex]->normal(refrRay.xpt);
+        glm::vec3 h = glm::refract(g, -m, eta);
+        Ray refrRay2(refrRay.xpt, h);
 
-        colorSum += refracCol;
+        colorSum += 0.9f * trace(refrRay2, step + 1);
     }
 
 
@@ -177,26 +162,26 @@ glm::vec3 trace(Ray ray, int step) {
 glm::vec3 antiAliasing(glm::vec3 eye, float pixel, float xp, float yp) {
     glm::vec3 colorSum(0);
 
-    float quarterPixel = pixel * 0.25;
-    float halfPixel = pixel * 0.5;
-    float centerX = xp + quarterPixel;
-    float centerY = yp + quarterPixel;
+    double quarterPixel = pixel * 0.25;
+    double halfPixel = pixel * 0.5;
+    double centerX = xp + quarterPixel;
+    double centerY = yp + quarterPixel;
 
     Ray ray = Ray(eye, glm::vec3(centerX, centerY, -EDIST));
     ray.normalize();
-    colorSum += trace(ray,1);
+    colorSum += trace(ray, 1);
 
     ray = Ray(eye, glm::vec3(centerX + halfPixel, centerY, -EDIST));
     ray.normalize();
-    colorSum += trace(ray,1);
+    colorSum += trace(ray, 1);
 
     ray = Ray(eye, glm::vec3(centerX, centerY + halfPixel, -EDIST));
     ray.normalize();
-    colorSum += trace(ray,1);
+    colorSum += trace(ray, 1);
 
     ray = Ray(eye, glm::vec3(centerX + halfPixel, centerY + halfPixel, -EDIST));
     ray.normalize();
-    colorSum += trace(ray,1);
+    colorSum += trace(ray, 1);
 
     // Average the color
     colorSum *= glm::vec3(0.25);
@@ -261,7 +246,7 @@ void initialize() {
     gluOrtho2D(XMIN, XMAX, YMIN, YMAX);
     Sphere *sphere2 = new Sphere(glm::vec3(14.0, 10.0, -90.0), 5.0, glm::vec3(0, 1, 0));
     Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(0, 0, 0));
-    Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(1, 0.65, 0));
+    Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(0, 0, 0));
 
     Plane *plane = new Plane(glm::vec3(-20., -20, -40),    //Point A
                              glm::vec3(20., -20, -40),     //Point B
