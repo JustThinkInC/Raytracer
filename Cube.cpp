@@ -46,7 +46,7 @@ float Cube::intersect(glm::vec3 posn, glm::vec3 dir) {
 * Returns the unit normal vector at a given point.
 * Assumption: The input point p lies on the sphere.
 */
-glm::vec3 Cube::normal(glm::vec3 p) {
+/*glm::vec3 Cube::normal(glm::vec3 p) {
     //https://stackoverflow.com/questions/16875946/ray-box-intersection-normal
 
     glm::vec3 vMax = glm::vec3(xMax, yMax, zMax);
@@ -81,4 +81,12 @@ glm::vec3 Cube::normal(glm::vec3 p) {
 
 
     return n;
+}*/
+
+glm::vec3 Cube::normal(glm::vec3 p) {
+    glm::vec3 vMax = glm::vec3(xMax, yMax, zMax);
+    glm::vec3 vMin = glm::vec3(xMin, yMin, zMin);
+    glm::vec3 center = (vMax + vMin) * 0.5f;
+    glm::vec3 n = glm::vec3(p.x - center.x, p.y - center.y, p.z - center.z);
+    return glm::normalize(n);
 }
