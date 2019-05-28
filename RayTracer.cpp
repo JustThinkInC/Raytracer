@@ -15,7 +15,6 @@
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Cone.h"
-#include "Tetrahedron.h"
 #include <GL/glut.h>
 #include "TextureBMP/TextureBMP.h"
 
@@ -324,11 +323,6 @@ void initialize() {
 
 
     Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
-    Tetrahedron *tetrahedron = new Tetrahedron(glm::vec3(-30, -20, -90),
-                                                glm::vec3(30, -20, -90),
-                                                glm::vec3(0, -20, -90),
-                                                glm::vec3(0, 20, -90),
-                                                glm::vec3(0, 1, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
