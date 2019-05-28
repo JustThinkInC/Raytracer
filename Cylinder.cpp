@@ -16,7 +16,6 @@
 float Cylinder::intersect(glm::vec3 posn, glm::vec3 dir) {
     //http://woo4.me/wootracer/cylinder-intersection/
     //https://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
-    //https://www.symbolab.com/solver/step-by-step/solve%20for%20t%2C%20t%5E%7B2%7D%2BBt%20%3D-%5Cfrac%7BC%7D%7B2%7D
     float a = (dir.x * dir.x) + (dir.z * dir.z);
     float b = 2 * (dir.x * (posn.x - center.x) + dir.z * (posn.z - center.z));
     float c = (posn.x - center.x) * (posn.x - center.x) + (posn.z - center.z) * (posn.z - center.z) - (radius * radius);

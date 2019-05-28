@@ -47,12 +47,12 @@ float Cone::intersect(glm::vec3 pos, glm::vec3 dir) {
 
     // P = P0 + td;
     float p = pos.y + (t0 * dir.y);
-    if ((p > center.y) && (p < center.y + height)) {
+    if ((p >= center.y) && (p <= center.y + height)) {
         return t0;
     }
 
     p = pos.y + (t1 * dir.y);
-    if ((p > center.y) && (p < center.y + height)) {
+    if ((p >= center.y) && (p <= center.y + height)) {
         return t1;
     }
 
