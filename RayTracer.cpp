@@ -155,7 +155,7 @@ glm::vec3 trace(Ray ray, int step) {
     }
 
     if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
-        colorSum += ambientCol * materialCol;
+        colorSum += ambientCol * materialCol + lDotnTwo * materialCol;
     }
 
     // Compute the Reflection
