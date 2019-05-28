@@ -167,14 +167,14 @@ glm::vec3 trace(Ray ray, int step) {
         colorSum = colorSum + (0.8f * reflectedCol);
     }
 
+    // Reflection on the floor
+    if (ray.xindex == 4 && step < MAX_STEPS) {
+        glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
+        Ray reflectedRay(ray.xpt, reflectedDir);
+        glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
 
-//    if (ray.xindex == 4 && step < MAX_STEPS) {
-//        glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
-//        Ray reflectedRay(ray.xpt, reflectedDir);
-//        glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
-//
-//        colorSum = colorSum + (0.2f * reflectedCol);
-//    }
+        colorSum = colorSum + (0.15f * reflectedCol);
+    }
 
     // Refraction
     if (ray.xindex == 3 && step < MAX_STEPS) {
