@@ -70,22 +70,10 @@ glm::vec3 trace(Ray ray, int step) {
 
     float lDotn = glm::dot(lightVector, normalVector);
     float lDotnTwo = glm::dot(lightVectorTwo, normalVector);
-
     float rDotv = glm::dot(reflVector, viewVector);
 
-    // Texture for floor
-//    if (ray.xindex == 4) {
-//        float s = (ray.xpt.x + 50) / 100;
-//        float t = (ray.xpt.y + 50) / 50;
-//
-//        materialCol = wood->getColorAt(s, t);
-//    }
-
+    // Texture the floor
     if (ray.xindex == 4) {
-
-//        float s = (ray.xpt.x - (-40)) / (40 - (-40));
-//        float t = (ray.xpt.z - (-40)) / ((-200) - (-40));
-
         float a1 = -40;
         float a2 = 40;
         float b1 = -50;
@@ -96,8 +84,6 @@ glm::vec3 trace(Ray ray, int step) {
     }
 
     // Texture for sphere:
-    // https://stackoverflow.com/questions/22420778/texture-mapping-in-a-ray-tracing-for-sphere-in-c
-    // http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
     if (ray.xindex == 1) {
         glm::vec3 center = glm::vec3(14, 10, -90);
         glm::vec3 N = glm::normalize(ray.xpt - center);
@@ -106,8 +92,7 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol = textures[1]->getColorAt(s, t);
     }
 
-
-
+    // Texture another sphere
     if (ray.xindex == 2) {
         glm::vec3 center = glm::vec3(5.0, 5, -80);
         glm::vec3 N = glm::normalize(ray.xpt - center);
@@ -134,7 +119,6 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol += textures[2]->getColorAt(texcoords, texcoordt);
 
     }
-
 
     // Procedural texture for cone
     if (ray.xindex == 7) {
@@ -163,7 +147,7 @@ glm::vec3 trace(Ray ray, int step) {
     Ray shadowTwo(ray.xpt, lightVectorTwo);
     shadowTwo.closestPt(sceneObjects);
 
-
+    // Computing the shadows
     if (lDotn <= 0 || shadow.xindex > -1 && shadow.xdist < ray.xdist) {
         colorSum += ambientCol * materialCol;
     } else {
@@ -174,8 +158,7 @@ glm::vec3 trace(Ray ray, int step) {
         colorSum += ambientCol * materialCol;
     }
 
-
-    // Reflection
+    // Compute the Reflection
     if (ray.xindex == 0 && step < MAX_STEPS) {
         glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
         Ray reflectedRay(ray.xpt, reflectedDir);
@@ -322,7 +305,7 @@ void initialize() {
     textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
 
 
-    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
+    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
