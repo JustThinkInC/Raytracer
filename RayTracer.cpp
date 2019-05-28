@@ -74,9 +74,9 @@ glm::vec3 trace(Ray ray, int step) {
 
     // Texture the floor
     if (ray.xindex == 4) {
-        float a1 = -40;
-        float a2 = 40;
-        float b1 = -50;
+        float a1 = -50;
+        float a2 = 50;
+        float b1 = 50;
         float b2 = -200;
         float texcoords = (ray.xpt.x-a1)/(a2-a1);
         float texcoordt = (ray.xpt.z-b1)/(b2-b1);
@@ -300,9 +300,9 @@ void initialize() {
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
 
-    textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/wood.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
-    textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
 
 
     Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));
