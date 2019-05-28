@@ -31,8 +31,7 @@ const float XMAX = WIDTH * 0.5;
 const float YMIN = -HEIGHT * 0.5;
 const float YMAX = HEIGHT * 0.5;
 
-TextureBMP *wood;
-TextureBMP *earth;
+vector<TextureBMP*> textures;
 
 vector<SceneObject *> sceneObjects;  //A global list containing pointers to objects in the scene
 
@@ -88,13 +87,13 @@ glm::vec3 trace(Ray ray, int step) {
 //        float s = (ray.xpt.x - (-40)) / (40 - (-40));
 //        float t = (ray.xpt.z - (-40)) / ((-200) - (-40));
 
-        float a1 = -20;
-        float a2 = 20;
-        float b1 = -40;
+        float a1 = -40;
+        float a2 = 40;
+        float b1 = -50;
         float b2 = -200;
         float texcoords = (ray.xpt.x-a1)/(a2-a1);
         float texcoordt = (ray.xpt.z-b1)/(b2-b1);
-        materialCol = wood->getColorAt(texcoords, texcoordt);
+        materialCol = textures[0]->getColorAt(texcoords, texcoordt);
     }
 
     // Texture for sphere:
@@ -105,7 +104,7 @@ glm::vec3 trace(Ray ray, int step) {
         glm::vec3 N = glm::normalize(ray.xpt - center);
         float s = 0.5 + atan2(N.z, N.x) / (2 * M_PI);
         float t = 0.5 + asin(N.y) / M_PI;
-        materialCol = earth->getColorAt(s, t);
+        materialCol = textures[1]->getColorAt(s, t);
     }
 
 
@@ -115,15 +114,28 @@ glm::vec3 trace(Ray ray, int step) {
         glm::vec3 N = glm::normalize(ray.xpt - center);
         float s = 0.5 - atan2(N.z, N.x) / (2 * M_PI);
         float t = 0.5 + asin(N.y) / M_PI;
-        materialCol = earth->getColorAt(s, t);
+        materialCol = textures[1]->getColorAt(s, t);
     }
 
     // Making a crate...
     if (ray.xindex == 5) {
-        float s = (ray.xpt.x - 10) / (15-10);
-        float t = (ray.xpt.y - 20) / (20 - 15);
-        materialCol = wood->getColorAt(s, t);
+        float a1 = 7;
+        float a2 = 12;
+        float b1 = -20;
+        float b2 = -15;
+        float texcoords = (ray.xpt.x-a1)/(a2-a1);
+        float texcoordt = (ray.xpt.y-b1)/(b2-b1);
+        materialCol = textures[2]->getColorAt(texcoords, texcoordt);
+
+        b1 = -90;
+        b2 = -95;
+
+        texcoords = (ray.xpt.x-a1)/(a2-a1);
+        texcoordt = (ray.xpt.z-b1)/(b2-b1);
+        materialCol += textures[2]->getColorAt(texcoords, texcoordt);
+
     }
+
 
     // Procedural texture for cone
     if (ray.xindex == 7) {
@@ -184,7 +196,7 @@ glm::vec3 trace(Ray ray, int step) {
 
     // Refraction
     if (ray.xindex == 3 && step < MAX_STEPS) {
-        float eta = 1.003;
+        float eta = 1.01;
         glm::vec3 g = glm::refract(ray.dir, normalVector, 1.0f/eta);
         Ray refrRay(ray.xpt, g);
         refrRay.closestPt(sceneObjects);
@@ -192,7 +204,7 @@ glm::vec3 trace(Ray ray, int step) {
         glm::vec3 h = glm::refract(g, -m, eta);
         Ray refrRay2(refrRay.xpt, h);
 
-        colorSum += 0.9f * trace(refrRay2, step + 1);
+        colorSum += trace(refrRay2, step + 1);
     }
 
 
@@ -292,27 +304,26 @@ void initialize() {
     Sphere *sphere3 = new Sphere(glm::vec3(5.0, 5.0, -80.0), 3, glm::vec3(0, 0, 0));
     Sphere *sphere4 = new Sphere(glm::vec3(5.0, -15.0, -80.0), 4, glm::vec3(0, 0, 0));
 
-//    Plane *plane = new Plane(glm::vec3(-40, -20, -40),    //Point A
-//                             glm::vec3(40, -20, -40),     //Point B
-//                             glm::vec3(40, -20, -200),    //Point C
-//                             glm::vec3(-40, -20, -200),   //Point D
-//                             glm::vec3(0, 0, 0));      //Colour
+    Plane *plane = new Plane(glm::vec3(-50, -20, -50),    //Point A
+                             glm::vec3(50, -20, -50),     //Point B
+                             glm::vec3(50, -20, -200),    //Point C
+                             glm::vec3(-50, -20, -200),   //Point D
+                             glm::vec3(0, 0, 0));      //Colour
 
-    Plane *plane = new Plane(glm::vec3(- 20., - 20, - 40),
-                             glm::vec3(20., - 20, - 40),
-                             glm::vec3(20., - 20, - 200),
-                             glm::vec3(- 20., - 20, - 200),
-                             glm::vec3(0.5, 0.5, 0));
+
     glClearColor(0, 0, 0, 1);
 
-    Cube *cube = new Cube(glm::vec3(10, -15, -90), glm::vec3(15, -20, -95), glm::vec3(0, 0, 0));
+    Cube *cube = new Cube(glm::vec3(7, -15, -90), glm::vec3(12, -20, -95), glm::vec3(0, 0, 0));
 
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
-    wood = new TextureBMP("../assets/crate.bmp");
-    earth = new TextureBMP("../assets/R&C.bmp");
 
-    Cone *cone = new Cone(glm::vec3(-20, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
+    textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
+
+
+    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
     Tetrahedron *tetrahedron = new Tetrahedron(glm::vec3(-30, -20, -90),
                                                 glm::vec3(30, -20, -90),
                                                 glm::vec3(0, -20, -90),
