@@ -14,11 +14,6 @@
 * Cylinder's intersection method.  The input is a ray (pos, dir).
 */
 float Cone::intersect(glm::vec3 pos, glm::vec3 dir) {
-    //http://lousodrome.net/blog/light/2017/01/03/intersection-of-a-ray-and-a-cone/
-    //https://www.cl.cam.ac.uk/teaching/1999/AGraphHCI/SMAG/node2.html
-    //http://www.ctralie.com/PrincetonUGRAD/Projects/COS426/Assignment3/part1.html#raycone
-    //http://www.ctralie.com/PrincetonUGRAD/Projects/COS426/Assignment3/part1.html#raycone
-
     float const A = pos.x - center.x;
     float const B = pos.z - center.z;
     float const C = height - pos.y + center.y;

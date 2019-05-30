@@ -97,8 +97,6 @@ glm::vec3 trace(Ray ray, int step) {
     }
 
     // Texture for sphere:
-    // https://stackoverflow.com/questions/22420778/texture-mapping-in-a-ray-tracing-for-sphere-in-c
-    // http://bentonian.com/teaching/AdvGraph1314/3.%20Ray%20tracing%20-%20color%20and%20texture.pdf
     if (ray.xindex == 1) {
         glm::vec3 center = glm::vec3(14, 10, -90);
         glm::vec3 N = glm::normalize(ray.xpt - center);
@@ -317,18 +315,12 @@ void initialize() {
 
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
+    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
 
+    // Textures
     textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
-
-
-    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));//glm::vec3(1, 0.26, 0));
-    Tetrahedron *tetrahedron = new Tetrahedron(glm::vec3(-30, -20, -90),
-                                                glm::vec3(30, -20, -90),
-                                                glm::vec3(0, -20, -90),
-                                                glm::vec3(0, 20, -90),
-                                                glm::vec3(0, 1, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);

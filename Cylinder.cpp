@@ -14,8 +14,6 @@
 * Cylinder's intersection method.  The input is a ray (pos, dir).
 */
 float Cylinder::intersect(glm::vec3 posn, glm::vec3 dir) {
-    //http://woo4.me/wootracer/cylinder-intersection/
-    //https://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
     float a = (dir.x * dir.x) + (dir.z * dir.z);
     float b = 2 * (dir.x * (posn.x - center.x) + dir.z * (posn.z - center.z));
     float c = (posn.x - center.x) * (posn.x - center.x) + (posn.z - center.z) * (posn.z - center.z) - (radius * radius);
