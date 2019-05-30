@@ -74,18 +74,7 @@ glm::vec3 trace(Ray ray, int step) {
     float rDotv = glm::dot(reflVector, viewVector);
 
     // Texture for floor
-//    if (ray.xindex == 4) {
-//        float s = (ray.xpt.x + 50) / 100;
-//        float t = (ray.xpt.y + 50) / 50;
-//
-//        materialCol = wood->getColorAt(s, t);
-//    }
-
     if (ray.xindex == 4) {
-
-//        float s = (ray.xpt.x - (-40)) / (40 - (-40));
-//        float t = (ray.xpt.z - (-40)) / ((-200) - (-40));
-
         float a1 = -40;
         float a2 = 40;
         float b1 = -50;
@@ -104,8 +93,7 @@ glm::vec3 trace(Ray ray, int step) {
         materialCol = textures[1]->getColorAt(s, t);
     }
 
-
-
+    // Texture for another sphere
     if (ray.xindex == 2) {
         glm::vec3 center = glm::vec3(5.0, 5, -80);
         glm::vec3 N = glm::normalize(ray.xpt - center);
@@ -133,7 +121,6 @@ glm::vec3 trace(Ray ray, int step) {
 
     }
 
-
     // Procedural texture for cone
     if (ray.xindex == 7) {
         int function = int(tan(ray.xpt.x) * sin(ray.xpt.y));
@@ -157,7 +144,6 @@ glm::vec3 trace(Ray ray, int step) {
     // Shadows
     Ray shadow(ray.xpt, lightVector);
     shadow.closestPt(sceneObjects);
-
     Ray shadowTwo(ray.xpt, lightVectorTwo);
     shadowTwo.closestPt(sceneObjects);
 
@@ -167,11 +153,9 @@ glm::vec3 trace(Ray ray, int step) {
     } else {
         colorSum += ambientCol * materialCol + lDotn * materialCol + rDotv * specular;
     }
-
     if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
         colorSum += ambientCol * materialCol;
     }
-
 
     // Reflection
     if (ray.xindex == 0 && step < MAX_STEPS) {
