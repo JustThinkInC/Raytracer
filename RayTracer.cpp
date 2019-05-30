@@ -43,7 +43,7 @@ glm::vec3 trace(Ray ray, int step) {
     glm::vec3 backgroundCol(0);
 
     glm::vec3 light(10, 40, -3);
-    glm::vec3 lightTwo(-30.0, 20, -3.0);
+    glm::vec3 lightTwo(-40.0, 50, -3.0);
 
     glm::vec3 ambientCol(0.2);   //Ambient color of light
 
@@ -66,18 +66,17 @@ glm::vec3 trace(Ray ray, int step) {
     glm::vec3 reflVector = glm::reflect(-lightVector, normalVector);
     glm::vec3 reflVectorTwo = glm::reflect(-lightVectorTwo, normalVector);
 
-    glm::vec3 colorSum = ambientCol * materialCol;
+    glm::vec3 colorSum(0);
 
     float lDotn = glm::dot(lightVector, normalVector);
     float lDotnTwo = glm::dot(lightVectorTwo, normalVector);
     float rDotv = glm::dot(reflVector, viewVector);
-    float rDotvTwo = glm::dot(reflVectorTwo, viewVector);
 
     // Texture the floor
     if (ray.xindex == 4) {
         float a1 = -50;
         float a2 = 50;
-        float b1 = 50;
+        float b1 = -50;
         float b2 = -200;
         float texcoords = (ray.xpt.x-a1)/(a2-a1);
         float texcoordt = (ray.xpt.z-b1)/(b2-b1);
@@ -104,8 +103,8 @@ glm::vec3 trace(Ray ray, int step) {
 
     // Making a crate...
     if (ray.xindex == 5) {
-        float a1 = 7;
-        float a2 = 12;
+        float a1 = 12;
+        float a2 = 17;
         float b1 = -20;
         float b2 = -15;
         float texcoords = (ray.xpt.x-a1)/(a2-a1);
@@ -125,11 +124,11 @@ glm::vec3 trace(Ray ray, int step) {
     if (ray.xindex == 7) {
         int function = int(tan(ray.xpt.x) * sin(ray.xpt.y));
         if (function % 2 == 0) {
-            colorSum = glm::vec3(1, 0, 0);
+            materialCol = glm::vec3(1, 0, 0);
         } else if (function % 2 == 1) {
-            colorSum = glm::vec3(0, 0, 1);
+            materialCol = glm::vec3(0, 0, 1);
         } else {
-            colorSum = glm::vec3(0, 1, 0);
+            materialCol = glm::vec3(0, 1, 0);
         }
     }
 
@@ -141,14 +140,6 @@ glm::vec3 trace(Ray ray, int step) {
         specular = pow(rDotv, 5);
     }
 
-
-    float specularTwo;
-    if (rDotvTwo < 0) {
-        specularTwo = 0;
-    } else {
-        specularTwo = pow(rDotvTwo, 5);
-    }
-
     // Shadows
     Ray shadow(ray.xpt, lightVector);
     shadow.closestPt(sceneObjects);
@@ -157,13 +148,15 @@ glm::vec3 trace(Ray ray, int step) {
     shadowTwo.closestPt(sceneObjects);
 
     // Computing the shadows
-    if (lDotn <= 0 || shadow.xindex > -1 && shadow.xdist < ray.xdist) {
+    if (lDotn <= 0 || ((shadow.xindex > -1) && (shadow.xdist < ray.xdist))) {
         colorSum += ambientCol * materialCol;
     } else {
         colorSum += ambientCol * materialCol + lDotn * materialCol + rDotv * specular;
     }
 
-    if (!(lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist)) {
+    if (lDotnTwo <= 0 || ((shadowTwo.xindex > -1) && (shadowTwo.xdist < ray.xdist))) {
+        colorSum += ambientCol * materialCol;
+    } else {
         colorSum += ambientCol * materialCol + lDotnTwo * materialCol;
     }
 
@@ -174,15 +167,6 @@ glm::vec3 trace(Ray ray, int step) {
         glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
 
         colorSum = colorSum + (0.8f * reflectedCol);
-    }
-
-    // Reflection on the floor
-    if (ray.xindex == 4 && step < MAX_STEPS) {
-        glm::vec3 reflectedDir = glm::reflect(ray.dir, normalVector);
-        Ray reflectedRay(ray.xpt, reflectedDir);
-        glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
-
-//        colorSum = colorSum + (0.1f * reflectedCol);
     }
 
     // Refraction
@@ -304,14 +288,14 @@ void initialize() {
 
     glClearColor(0, 0, 0, 1);
 
-    Cube *cube = new Cube(glm::vec3(7, -15, -90), glm::vec3(12, -20, -95), glm::vec3(0, 0, 0));
+    Cube *cube = new Cube(glm::vec3(12, -15, -90), glm::vec3(17, -20, -95), glm::vec3(0, 0, 0));
 
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
 
-    textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/wood.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
-    textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/crate2.bmp"));
 
 
     Cone *cone = new Cone(glm::vec3(-15, -10, -85), 5, 10, glm::vec3(0, 0, 0));
