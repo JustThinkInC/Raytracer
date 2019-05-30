@@ -71,6 +71,7 @@ glm::vec3 trace(Ray ray, int step) {
     float lDotn = glm::dot(lightVector, normalVector);
     float lDotnTwo = glm::dot(lightVectorTwo, normalVector);
     float rDotv = glm::dot(reflVector, viewVector);
+    float rDotvTwo = glm::dot(reflVectorTwo, viewVector);
 
     // Texture the floor
     if (ray.xindex == 4) {
@@ -140,6 +141,14 @@ glm::vec3 trace(Ray ray, int step) {
         specular = pow(rDotv, 5);
     }
 
+
+    float specularTwo;
+    if (rDotvTwo < 0) {
+        specularTwo = 0;
+    } else {
+        specularTwo = pow(rDotvTwo, 5);
+    }
+
     // Shadows
     Ray shadow(ray.xpt, lightVector);
     shadow.closestPt(sceneObjects);
@@ -154,7 +163,7 @@ glm::vec3 trace(Ray ray, int step) {
         colorSum += ambientCol * materialCol + lDotn * materialCol + rDotv * specular;
     }
 
-    if (lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist) {
+    if (!(lDotnTwo <= 0 || shadowTwo.xindex > -1 && shadowTwo.xdist < ray.xdist)) {
         colorSum += ambientCol * materialCol + lDotnTwo * materialCol;
     }
 
@@ -173,7 +182,7 @@ glm::vec3 trace(Ray ray, int step) {
         Ray reflectedRay(ray.xpt, reflectedDir);
         glm::vec3 reflectedCol = trace(reflectedRay, step + 1); //Recursion!
 
-        colorSum = colorSum + (0.15f * reflectedCol);
+//        colorSum = colorSum + (0.1f * reflectedCol);
     }
 
     // Refraction
@@ -300,12 +309,12 @@ void initialize() {
     Cylinder *cylinder = new Cylinder(glm::vec3(-5, -15, -80), 2, 3, glm::vec3(1, 1, 1));
 
 
-    textures.push_back(new TextureBMP((char *)"assets/wood.bmp"));
-    textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/brick_1.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
 
 
-    Cone *cone = new Cone(glm::vec3(-15, -20, -95), 5, 10, glm::vec3(0, 0, 0));
+    Cone *cone = new Cone(glm::vec3(-15, -10, -85), 5, 10, glm::vec3(0, 0, 0));
 
     //--Add the above to the list of scene objects.
     sceneObjects.push_back(sphere1);
