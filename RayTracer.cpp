@@ -15,7 +15,6 @@
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Cone.h"
-#include "Tetrahedron.h"
 #include <GL/glut.h>
 #include "TextureBMP/TextureBMP.h"
 
@@ -208,6 +207,7 @@ glm::vec3 trace(Ray ray, int step) {
 
     return colorSum;
 }
+
 
 
 glm::vec3 antiAliasing(glm::vec3 eye, float pixel, float xp, float yp) {
