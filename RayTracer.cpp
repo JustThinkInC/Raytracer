@@ -136,9 +136,9 @@ glm::vec3 trace(Ray ray, int step) {
     if (ray.xindex == 6) {
         int function = int(ray.xpt.x - ray.xpt.y);
         if (function % 2 == 0) {
-            materialCol = glm::vec3(1, 1, 1);
+            materialCol = glm::vec3(0.26, 0.88, 0.81);
         } else {
-            materialCol = glm::vec3(0, 0, 0);
+            materialCol = glm::vec3(1, 0.65, 0);
         }
     }
 
