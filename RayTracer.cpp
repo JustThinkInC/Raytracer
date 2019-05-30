@@ -132,6 +132,16 @@ glm::vec3 trace(Ray ray, int step) {
         }
     }
 
+    //Procedural texture for cylinder
+    if (ray.xindex == 6) {
+        int function = int(ray.xpt.x - ray.xpt.y);
+        if (function % 2 == 0) {
+            materialCol = glm::vec3(1, 1, 1);
+        } else {
+            materialCol = glm::vec3(0, 0, 0);
+        }
+    }
+
     // Reflections
     float specular;
     if (rDotv < 0) {
@@ -295,7 +305,7 @@ void initialize() {
 
     textures.push_back(new TextureBMP((char *)"assets/wood.bmp"));
     textures.push_back(new TextureBMP((char *)"assets/R&C.bmp"));
-    textures.push_back(new TextureBMP((char *)"assets/crate2.bmp"));
+    textures.push_back(new TextureBMP((char *)"assets/crate.bmp"));
 
 
     Cone *cone = new Cone(glm::vec3(-15, -10, -85), 5, 10, glm::vec3(0, 0, 0));
