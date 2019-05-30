@@ -20,7 +20,7 @@ int SIGN(T val) {
 * Cube's intersection method.  The input is a ray (pos, dir).
 */
 float Cube::intersect(glm::vec3 posn, glm::vec3 dir) {
-    float tx1, tx2, ty1, ty2, tz1, tz2, tNear = -1 * INFINITY, tFar = INFINITY;
+    float tx1, tx2, ty1, ty2, tz1, tz2, tNear, tFar;
     tx1 = (xMin - posn.x) / dir.x;
     tx2 = (xMax - posn.x) / dir.x;
     ty1 = (yMin - posn.y) / dir.y;
