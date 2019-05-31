@@ -87,18 +87,18 @@ glm::vec3 trace(Ray ray, int step) {
     if (ray.xindex == 1) {
         glm::vec3 center = glm::vec3(14, 10, -90);
         glm::vec3 N = glm::normalize(ray.xpt - center);
-        float s = 0.5 + atan2(N.z, N.x) / (2 * M_PI);
-        float t = 0.5 + asin(N.y) / M_PI;
-        materialCol = textures[1]->getColorAt(s, t);
+        float s = 0.45 + atan2(N.z, N.x) / (2 * M_PI);
+        float t = 0.65 + asin(N.y) / M_PI;
+        materialCol = 0.7f * textures[1]->getColorAt(s, t);
     }
 
     // Texture another sphere
     if (ray.xindex == 2) {
         glm::vec3 center = glm::vec3(5.0, 5, -80);
         glm::vec3 N = glm::normalize(ray.xpt - center);
-        float s = 0.5 - atan2(N.z, N.x) / (2 * M_PI);
+        float s = 0.65 - atan2(N.z, N.x) / (2 * M_PI);
         float t = 0.5 + asin(N.y) / M_PI;
-        materialCol = textures[1]->getColorAt(s, t);
+        materialCol = 0.7f * textures[1]->getColorAt(s, t);
     }
 
     // Making a crate...
